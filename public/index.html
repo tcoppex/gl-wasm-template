@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="C++ / WebAssembly App"/>
+    <meta name="keywords" content="WebAssembly, emscripten, c++, OpenGL">
+    <meta name="author" content="tcoppex">
+
+    <title>C++ / WebAssembly App</title>
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/styles.css">
+  
+    <script defer type="text/javascript" src="index.js"></script>
+  </head>
+
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    
+    <div id="root">
+      <!-- ------------- -->
+      <div class="emscripten_border">
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+      </div>
+
+      <div class="emscripten">
+        <input type="checkbox" id="resize">Resize canvas
+        <input type="checkbox" id="pointerLock" checked>Lock/hide mouse pointer
+        <input type="button" value="Go Fullscreen" onclick="onRequestFullscreen();">
+      </div>
+      <!-- ------------- -->
+    </div>
+    
+  </body>
+</html>
