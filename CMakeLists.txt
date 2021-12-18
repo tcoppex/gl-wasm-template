@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.12.0)
 
-project(wasm_app VERSION 0.1 LANGUAGES CXX C)
+project(wasmAppFramework VERSION 0.2 LANGUAGES CXX C)
 
 # -----------------------------------------------------------------------------
 # CMake policies.
@@ -57,10 +57,12 @@ set(PROJECT_ROOT_PATH               ${CMAKE_CURRENT_SOURCE_DIR})
 set(PROJECT_SOURCE_DIR              ${PROJECT_ROOT_PATH}/src)
 set(PROJECT_THIRD_PARTY_DIR         ${PROJECT_ROOT_PATH}/third_party)
 set(PROJECT_TOOLS_DIR               ${PROJECT_ROOT_PATH}/tools)
+set(PROJECT_RESOURCES_DIR           ${PROJECT_ROOT_PATH}/resources)
+set(PROJECT_WEB_STATIC_DIR          ${PROJECT_RESOURCES_DIR}/static)
 
 # Output directories.
 set(PROJECT_BINARY_DIR              ${PROJECT_ROOT_PATH}/bin)
-set(PROJECT_PUBLIC_DIR              ${PROJECT_ROOT_PATH}/public) #
+set(PROJECT_PUBLIC_DIR              ${PROJECT_BINARY_DIR}/public)
 
 # -----------------------------------------------------------------------------
 # CMake includes.
@@ -442,6 +444,6 @@ endif()
 # Sources.
 # -----------------------------------------------------------------------------
 
-add_subdirectory(${PROJECT_SOURCE_DIR})
+add_subdirectory(${PROJECT_SOURCE_DIR}/cpp/) #
 
 # -----------------------------------------------------------------------------
