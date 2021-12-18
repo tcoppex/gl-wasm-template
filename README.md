@@ -2,18 +2,14 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<!-- cpp_wasm_gl_app_template -->
-<!-- cpp_wasm_template -->
-<!-- gl-wasm-template -->
-
 This project offers a light boilerplate to build cross-platform C++17 / WebAssembly OpenGL app using CMake, GLFW and emscripten.
 
 ## Quickstart
 
 #### Dependencies.
 
-For this project you will need to install CMake 3.12.0+ and the [emsdk](https://github.com/emscripten-core/emsdk).
-GLFW3 can be retrieved as a submodule.
+You will need CMake 3.12.0+ and the emscripten SDK ([emsdk](https://github.com/emscripten-core/emsdk)) installed on your system for
+this to work, while GLFW3 will be retrieved as submodule.
 
 #### Cloning.
 
@@ -52,13 +48,13 @@ cd ..
 
 #### Running / serving the files.
 
-You will find the desktop application in the `bin/` directory, whereas the web 
-app is in `public/`.
+You will find the desktop application in the `bin/` directory and the web 
+application in `bin/public/`.
 
 WebAssembly requires a proper server to run its application. For this you can either use
  `http-server` (if available on your system) or the custom script provided in `tools/simple_server` :
 ```bash
-../tools/simple_server/main.py --serve ../public
+../tools/simple_server/main.py --serve ../bin/public
 ```
 
 <!-- 
@@ -71,13 +67,12 @@ WebAssembly requires a proper server to run its application. For this you can ei
 
 ### TODO
 
-* Proper cpp framework / sample / public_api structure.
-* Better web-side structure.
-* Improved events handling.
-* NPM package utilities (compiler / minifier / automatic server)
-* Advanced samples structures.
-* Advanced front-end : React sample.
-* Advanced back-end : server-side sample.
+* Better web / js pipeline.
+* NPM package utilities (compiler / minifier / automatic server),
+* Improved events handling,
+* Advanced samples structures,
+* Advanced front-end : React sample,
+* Advanced back-end : server-side sample,
 * native Android support ?
 
 ## References
