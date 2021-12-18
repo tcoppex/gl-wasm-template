@@ -1,1 +1,4 @@
 public/wasm_app.*
+bin/
+build/
+BUILD/
