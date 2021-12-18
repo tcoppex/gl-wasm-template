@@ -3,10 +3,42 @@
 // ----------------------------------------------------------------------------
 
 /* Application name, used to retrieve the compiled WASM / JS files. */
-const kAppName = "wasm_app";
+const kAppName = "wasmApp";
 
 /* Canvas ID to receive the OpenGL context. */
 const kOpenGLCanvasID = "canvas";
+
+// ----------------------------------------------------------------------------
+
+// import * as SampleAPI from '/js/sampleApp.js';
+
+/* Simple interface to the C++ code. */
+class FrameworkAPI {
+  constructor (module) {
+    this.module = module;
+    this.argc = module.arguments.length;
+    this.argv = module.arguments.slice();
+
+    this.setVerticalSync = module._setVerticalSync;
+    this.getSurfaceWidth = module._getSurfaceWidth;
+    this.getSurfaceHeight = module._getSurfaceHeight;
+  }
+};
+
+/* Sample API interface. */
+class SampleAPI extends FrameworkAPI {
+  constructor (module) {
+    super(module);
+    this.setBackgroundColor = module._setBackgroundColor;
+    
+    // Test everythings is working.
+    api.setVerticalSync(true);
+    api.setBackgroundColor(0.0, 0.5, 0.8);
+    console.log(api.getSurfaceWidth() + " " + api.getSurfaceHeight())
+  }
+};
+
+// ----------------------------------------------------------------------------
 
 /* Pre-declare the module object, modified after <body> loaded. */
 var Module = {};
@@ -16,30 +48,17 @@ var api = null;
 
 // ----------------------------------------------------------------------------
 
-/* Simple interface to the C++ code. */
-class API {
-  constructor (module) {
-    this.module = module;
-    this.argc = module.arguments.length;
-    this.argv = module.arguments.slice();
-
-    this.setBackgroundColor = module._setBackgroundColor;
-    this.setVerticalSync = module._setVerticalSync;
-  }
-};
-
-/* Initialize our API. */
-function initialize_custom_cppjs_api() {
-  api = new API(Module);
-  api.setBackgroundColor(0.0, 0.5, 0.8);
+/* Initialize our API from C++. */
+function initialize_cpp_js_api() {
+  api = new SampleAPI(Module);
 }
 
 // ----------------------------------------------------------------------------
 
 /* Custom event for the HTML file. */
 function onRequestFullscreen() {
-  let $pointerLock = document.getElementById('pointerLock');
-  let $resize      = document.getElementById('resize');
+  let $pointerLock = document.getElementById("pointerLock");
+  let $resize      = document.getElementById("resize");
   Module.requestFullscreen($pointerLock.checked, $resize.checked);
 }
 
@@ -79,7 +98,7 @@ window.addEventListener("load", () => {
 
   /* Fetch manually the WASM / App js script. */
   /// When using this method we cannot add "prefix-js" module code inside the
-  /// compiled JS, or it will be replaced.
+  /// compiled JS, or it would be replaced.
   fetch(`${kAppName}.wasm`)
     .then(response => response.arrayBuffer())
     .then(bytes => {
