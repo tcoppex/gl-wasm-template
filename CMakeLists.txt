@@ -321,8 +321,8 @@ if (EMSCRIPTEN)
     
     -sUSE_WEBGL2=1                        # Enable WebGL 2.0.
     -sMIN_WEBGL_VERSION=2                 # Set WebGL minimum version to 2.0.
-    -sMAX_WEBGL_VERSION=12                # Set WebGL maximum version to 2.0.
-    -sFULL_ES3=1                          # Enable OpenGL ES 3.0 emulation.
+    -sMAX_WEBGL_VERSION=2                 # Set WebGL maximum version to 2.0.
+    # -sFULL_ES3=1                          # Enable OpenGL ES 3.0 emulation (not recommended).
 
     -sUSE_GLFW=3                          # Enable GLFW 3
   )
