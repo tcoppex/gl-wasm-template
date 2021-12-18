@@ -111,12 +111,12 @@ if (EMSCRIPTEN)
 
   # [TMP] Copy the index.js file to the public directory.
   set(IndexJSFile "${PROJECT_SOURCE_DIR}/js/index.js") #
-  add_custom_command(
-    TARGET
-      ${AppTarget} 
-    POST_BUILD
+  add_custom_target(
+    CopyIndexJSFile  ALL #TARGET ${AppTarget} POST_BUILD
     COMMAND 
       ${CMAKE_COMMAND} -E copy "${IndexJSFile}" "${PROJECT_PUBLIC_DIR}/"
+    SOURCES
+      ${IndexJSFile}
     COMMENT
       "Copying index.js to bin/public/."
   )
