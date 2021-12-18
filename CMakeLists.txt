@@ -299,7 +299,6 @@ endif()
 # -----------------------------------------------------------------------------
 
 # See 
-#   * https://emscripten.org/docs/getting_started/FAQ.html
 #   * https://emscripten.org/docs/compiling/WebAssembly.html
 #   * https://emscripten.org/docs/tools_reference/emcc.html
 if (EMSCRIPTEN)
@@ -360,9 +359,6 @@ if (EMSCRIPTEN)
     )
   endif()
   # ---------------------------------
-
-  # Need to install the webapp files in "public/" (or somewhere..).
-  # (done temporarly, after the build command)
 
 endif()
 
