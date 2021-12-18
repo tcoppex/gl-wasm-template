@@ -393,7 +393,7 @@ if(NOT EMSCRIPTEN)
                         "git submodule update --init"
     )
   endif()
-  set(BUILD_SHARED_LIBS   OPT_BUILD_SHARED_LIBS CACHE BOOL "Build GLFW as shared library.")
+  set(GLFW_BUILD_SHARED_LIBS   OPT_BUILD_SHARED_LIBS CACHE BOOL "Build GLFW as shared library.")
   set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Do not build GLFW examples.")
   set(GLFW_BUILD_TESTS    OFF CACHE BOOL "Do not run GLFW tests.")
   set(GLFW_BUILD_DOCS     OFF CACHE BOOL "Do not build GLFW documentation.")
