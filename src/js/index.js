@@ -32,9 +32,9 @@ class SampleAPI extends FrameworkAPI {
     this.setBackgroundColor = module._setBackgroundColor;
     
     // Test everythings is working.
-    api.setVerticalSync(true);
-    api.setBackgroundColor(0.0, 0.5, 0.8);
-    console.log(api.getSurfaceWidth() + " " + api.getSurfaceHeight())
+    this.setVerticalSync(true);
+    this.setBackgroundColor(0.0, 0.5, 0.8);
+    console.log(this.getSurfaceWidth() + " " + this.getSurfaceHeight())
   }
 };
 
