@@ -1,7 +1,9 @@
-#include "cpp/api_sample.h"
+#include "framework/api/lib.h"
 
 #include <iostream>
-#include "cpp/app.h"
+#include <emscripten/emscripten.h>
+
+#include "framework/base_app.h" //
 
 // ----------------------------------------------------------------------------
 
@@ -13,10 +15,12 @@ void setVerticalSync(bool status) {
   }
 }
 
-void setBackgroundColor(float r, float g, float b) {
-  if (auto api = App::GetAPI(); api) {
-    api->setBackgroundColor(r, g, b);
-  }
+int getSurfaceWidth() {
+  return BaseApp::GetBaseAPI().getWidth();
+}
+
+int getSurfaceHeight() {
+  return BaseApp::GetBaseAPI().getHeight();
 }
 
 // ----------------------------------------------------------------------------

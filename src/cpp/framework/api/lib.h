@@ -1,7 +1,8 @@
-#ifndef LIB_H_
-#define LIB_H_
+#ifndef FRAMEWORK_API_LIB_H_
+#define FRAMEWORK_API_LIB_H_
 
-#include "emscripten.h"
+#include <emscripten/em_macros.h>
+// #define EMSCRIPTEN_KEEPALIVE __attribute__((used))
 
 // ----------------------------------------------------------------------------
 
@@ -11,10 +12,12 @@ extern "C" {
 
 EMSCRIPTEN_KEEPALIVE void setVerticalSync(bool status);
 
-EMSCRIPTEN_KEEPALIVE void setBackgroundColor(float r, float g, float b);
+EMSCRIPTEN_KEEPALIVE int getSurfaceWidth();
+
+EMSCRIPTEN_KEEPALIVE int getSurfaceHeight();
 
 }
 
 // ----------------------------------------------------------------------------
 
-#endif // LIB_H_
+#endif // FRAMEWORK_API_LIB_H_

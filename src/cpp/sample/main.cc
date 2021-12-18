@@ -1,6 +1,6 @@
-#include "cpp/app.h"
+#include "sample/sample_app.h"
 
 int main(int argc, char *argv[]) {
-  App app;
+  SampleApp app;
   return app.run();
 }
