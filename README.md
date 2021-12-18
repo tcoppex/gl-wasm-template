@@ -58,8 +58,7 @@ app is in `public/`.
 WebAssembly requires a proper server to run its application. For this you can either use
  `http-server` (if available on your system) or the custom script provided in `tools/simple_server` :
 ```bash
-cd ../public
-../tools/simple_server/main.py
+../tools/simple_server/main.py --serve ../public
 ```
 
 <!-- 
@@ -75,7 +74,6 @@ cd ../public
 * Proper cpp framework / sample / public_api structure.
 * Better web-side structure.
 * Improved events handling.
-* Add arguments to the server script (directory, host, port).
 * NPM package utilities (compiler / minifier / automatic server)
 * Advanced samples structures.
 * Advanced front-end : React sample.
