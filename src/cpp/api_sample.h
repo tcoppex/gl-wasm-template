@@ -9,10 +9,6 @@
 
 extern "C" {
 
-EMSCRIPTEN_KEEPALIVE void testCall();
-EMSCRIPTEN_KEEPALIVE void printNumber(int f);
-EMSCRIPTEN_KEEPALIVE int square(int c);
-
 EMSCRIPTEN_KEEPALIVE void setVerticalSync(bool status);
 
 EMSCRIPTEN_KEEPALIVE void setBackgroundColor(float r, float g, float b);

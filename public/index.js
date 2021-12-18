@@ -100,10 +100,3 @@ window.addEventListener("load", () => {
 });
 
 // ----------------------------------------------------------------------------
-
-/* [todo ?] Custom event signalling the wasm binary has been loaded. */
-// window.addEventListener("wasmLoaded", () => {
-//   console.log(" >> wasm loaded.");  
-// });
-
-// ----------------------------------------------------------------------------
