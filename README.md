@@ -11,25 +11,24 @@ We will be using the command-line on Unix and [Git Bash](https://git-for-windows
 
 <details>
   <summary><strong>Quick start & run !</strong></summary>
-  <div class="highlight">
-<pre><span class="c1"># [Optional] Retrieve system build dependencies on Unix via synaptic.</span>
-<span class="c1"># sudo apt install git build-essential cmake ninja-build</span>
+<div class="highlight highlight-source-shell"><pre><span class="pl-c"><span class="pl-c">#</span> [Optional] Retrieve system build dependencies on Unix via synaptic.</span>
+<span class="pl-c"><span class="pl-c">#</span> sudo apt install git build-essential cmake ninja-build</span>
 
-<span class="c1"># Clone the project with its submodule.</span>
+<span class="pl-c"><span class="pl-c">#</span> Clone the project with its submodule.</span>
 git clone --recurse-submodules -j4 https://github.com/tcoppex/gl-wasm-template
-<span class="nb">cd </span>gl-wasm-template
+<span class="pl-c1">cd</span> gl-wasm-template
 
-<span class="c1"># Create a build directory.</span>
-mkdir BUILD <span class="o">&amp;&amp;</span> <span class="nb">cd </span>BUILD
+<span class="pl-c"><span class="pl-c">#</span> Create a build directory.</span>
+mkdir BUILD <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">cd</span> BUILD
 
-<span class="c1"># Compile for the web (using emcmake before cmake).</span>
-emcmake cmake .. -GNinja -DCMAKE_BUILD_TYPE<span class="o">=</span>Release
-cmake --build .
+<span class="pl-c"><span class="pl-c">#</span> Compile for the web (using emcmake before cmake).</span>
+emcmake cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release
+cmake --build <span class="pl-c1">.</span>
 
-<span class="c1"># Serve the webapp.</span>
+<span class="pl-c"><span class="pl-c">#</span> Serve the webapp.</span>
 python3 ../tools/simple_server/main.py --serve ../bin/public
 </pre>
-  </div>
+</div>
 </details>
 
 #### Requirements.
