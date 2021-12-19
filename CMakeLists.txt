@@ -2,15 +2,18 @@
 # CMake configuration file (2021 - unlicense.org)
 # 
 # -----------------------------------------------------------------------------
-cmake_minimum_required(VERSION 3.12.0)
-
-project(wasmAppFramework VERSION 0.2 LANGUAGES CXX C)
+cmake_minimum_required(VERSION 2.8.12) # 3.12.0 
 
 # -----------------------------------------------------------------------------
 # CMake policies.
 # -----------------------------------------------------------------------------
 
-# Force OpenGL_GL_PREFERENCE to be set to GLVND instead of LEGACY.
+# Enable the use of "VERSION" for project setting in lower cmake version.
+if(POLICY CMP0048)
+  cmake_policy(SET CMP0048 NEW)
+endif()
+
+# Force OpenGL_GL_PREFERENCE to be set to GLVND (GL3+) instead of LEGACY (GL2).
 if(POLICY CMP0072)
   cmake_policy(SET CMP0072 NEW)
 endif()
@@ -28,6 +31,8 @@ endif()
 # -----------------------------------------------------------------------------
 # Project options.
 # -----------------------------------------------------------------------------
+
+project(wasmAppFramework VERSION 0.2 LANGUAGES CXX C)
 
 # Enable clang static code analyzer.
 option(OPT_ENABLE_CLANG_TIDY        "Use clang-tidy ?"                      OFF)
@@ -110,8 +115,8 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "" CACHE INTERNAL "")
 # Force a specific output directory. Used to bypass MSVC settings.
 helpers_setGlobalOutputDirectory(${PROJECT_BINARY_DIR})
 
-# Force debug mode by default when no target is specified.
-# (when set with generator working at cache generation time like Makefile / Ninja).
+# Force debug mode by default when no target is specified
+# (for generators working at cache generation time like Makefile / Ninja).
 helpers_setDefaultBuildType("Debug")
 
 # -----------------------------------------------------------------------------
@@ -330,7 +335,7 @@ if (EMSCRIPTEN)
 
   # Exported runtime methods to be used from javascript code.
   list(APPEND CustomLinkFlags
-    -sEXPORTED_RUNTIME_METHODS="['cwrap','ccall']"
+    -sEXPORTED_RUNTIME_METHODS="['cwrap','ccall','allocate','writeStringToMemory','intArrayFromString']"
   )
 
   # Linker debug flags.
