@@ -1,16 +1,4 @@
 # -----------------------------------------------------------------------------
-
-list(APPEND CustomIncludeDirs
-  ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-# Transform link flags from a list to a string.
-set(LinkFlags "")
-foreach(flag ${CustomLinkFlags})
-  set(LinkFlags "${LinkFlags} ${flag}")
-endforeach()
-
-# -----------------------------------------------------------------------------
 # Sources.
 # -----------------------------------------------------------------------------
 
@@ -26,12 +14,12 @@ list(APPEND SampleSources
 )
 
 # Example of API usage for emscripten.
-if (EMSCRIPTEN)
+if(EMSCRIPTEN)
   list(APPEND SampleSources
     sample/api/lib.cc
 
-    # [fixme/improve]
-    # Compile the framework's API with the sources to make it availables in the JS module.
+    # [fixme?]
+    # Compile the framework's API along with sample's ones to make it availables in the JS module.
     framework/api/lib.cc
   )
 endif()
@@ -40,18 +28,18 @@ endif()
 # Target properties and build parameters.
 # -----------------------------------------------------------------------------
 
-set(AppTarget "wasmApp")
-set(FrameworkTarget "wasmFramework")
-list(APPEND Targets ${FrameworkTarget} ${AppTarget})
-
 # Framework Target (library).
+set(FrameworkTarget "wasmFramework")
 add_library(${FrameworkTarget} ${PROJECT_LIB_TYPE} ${FrameworkSources})
 
 # Sample Target (executable).
+set(AppTarget "wasmApp")
 add_executable(${AppTarget} ${SampleSources})
 target_link_libraries(${AppTarget} ${FrameworkTarget})
 
 # -----------------------------------------------------------------------------
+
+list(APPEND Targets ${FrameworkTarget} ${AppTarget})
 
 # Set generic target properties.
 foreach(target ${Targets})
@@ -70,7 +58,9 @@ foreach(target ${Targets})
 #      $<INSTALL_INTERFACE:include>
   )
   target_link_libraries(${target} ${CustomLibs})
-  set_target_properties(${target} PROPERTIES LINK_FLAGS ${LinkFlags})
+
+  # [prefers LINK_OPTION with a list on Cmake 3.13+]
+  set_target_properties(${target} PROPERTIES LINK_FLAGS ${LinkFlagsString})
 
   # Force Debug / Release output in the same directory (for MSVC).
   helpers_setTargetOutputDirectory(${target} ${PROJECT_BINARY_DIR})
@@ -79,11 +69,11 @@ endforeach()
 # -----------------------------------------------------------------------------
 
 # Set specific target properties.
-if (EMSCRIPTEN)
-  # Force wasm executable to be installed in the public distributables directory.
+if(EMSCRIPTEN)
+  # Force the wasm app to be installed in the public distributables directory.
   helpers_setTargetOutputDirectory(${AppTarget} ${PROJECT_PUBLIC_DIR})
 
-  # Create the public distributables directory to serve the HTTP server.
+  # Create the public distributables directory to be served by the HTTP server.
   add_custom_command(
     TARGET
       ${AppTarget} 
@@ -112,7 +102,7 @@ if (EMSCRIPTEN)
   # [TMP] Copy the index.js file to the public directory.
   set(IndexJSFile "${PROJECT_SOURCE_DIR}/js/index.js") #
   add_custom_target(
-    CopyIndexJSFile  ALL #TARGET ${AppTarget} POST_BUILD
+    CopyIndexJSFile  ALL
     COMMAND 
       ${CMAKE_COMMAND} -E copy "${IndexJSFile}" "${PROJECT_PUBLIC_DIR}/"
     SOURCES

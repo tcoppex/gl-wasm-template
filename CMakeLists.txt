@@ -2,13 +2,13 @@
 # CMake configuration file (2021 - unlicense.org)
 # 
 # -----------------------------------------------------------------------------
-cmake_minimum_required(VERSION 2.8.12) # 3.12.0 
+cmake_minimum_required(VERSION 3.10.2) 
 
 # -----------------------------------------------------------------------------
 # CMake policies.
 # -----------------------------------------------------------------------------
 
-# Enable the use of "VERSION" for project setting in lower cmake version.
+# Enable the use of "VERSION" for project setting in older cmake version.
 if(POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif()
@@ -29,10 +29,14 @@ if(POLICY CMP0092)
 endif()
 
 # -----------------------------------------------------------------------------
-# Project options.
+# Project.
 # -----------------------------------------------------------------------------
 
 project(wasmAppFramework VERSION 0.2 LANGUAGES CXX C)
+
+# -----------------------------------------------------------------------------
+# Options.
+# -----------------------------------------------------------------------------
 
 # Enable clang static code analyzer.
 option(OPT_ENABLE_CLANG_TIDY        "Use clang-tidy ?"                      OFF)
@@ -40,26 +44,27 @@ option(OPT_ENABLE_CLANG_TIDY        "Use clang-tidy ?"                      OFF)
 # Enable RTTI.
 option(OPT_ENABLE_RTTI              "Use RTTI ?"                            OFF)
 
-# Concurrency might be used to speedup some loops.
+# Pragma concurrency might be used on some loops.
 option(OPT_USE_OPENMP               "Use OpenMP for pragma concurrency ?"   OFF)
 
 # Choose how to compile the libraries.
 option(OPT_BUILD_SHARED_LIBS        "Compile libraries as shared ?"         OFF)
 
-if (OPT_BUILD_SHARED_LIBS)
+if(OPT_BUILD_SHARED_LIBS)
   set(PROJECT_LIB_TYPE SHARED)
 else()
   set(PROJECT_LIB_TYPE STATIC)
 endif()
 
 # -----------------------------------------------------------------------------
-# Project paths.
+# Paths.
 # -----------------------------------------------------------------------------
 
 set(PROJECT_ROOT_PATH               ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Input directories.
 set(PROJECT_SOURCE_DIR              ${PROJECT_ROOT_PATH}/src)
+set(PROJECT_CPP_SOURCE_DIR          ${PROJECT_SOURCE_DIR}/cpp)
 set(PROJECT_THIRD_PARTY_DIR         ${PROJECT_ROOT_PATH}/third_party)
 set(PROJECT_TOOLS_DIR               ${PROJECT_ROOT_PATH}/tools)
 set(PROJECT_RESOURCES_DIR           ${PROJECT_ROOT_PATH}/resources)
@@ -87,7 +92,7 @@ include(ProcessorCount)
 ProcessorCount(PROJECT_NPROC_MAX)
 
 # -----------------------------------------------------------------------------
-# CMake general options.
+# CMake settings.
 # -----------------------------------------------------------------------------
 
 set(CMAKE_VERBOSE_MAKEFILE          OFF)
@@ -126,12 +131,13 @@ helpers_setDefaultBuildType("Debug")
 # Determines if the build is flagged for full debug mode.
 if(CMAKE_BUILD_TYPE MATCHES "Debug")
   set(DEBUG TRUE)
+  message(STATUS "DEBUG build.")
 else()
   set(DEBUG FALSE)
 endif()
 
 # Determines the build platform.
-if(UNIX AND NOT APPLE AND NOT ANDROID AND NOT WEBGL)
+if(UNIX AND NOT APPLE AND NOT ANDROID)
   set(OS_NAME "Linux")
   set(OS_LINUX TRUE)
 elseif(WIN32)
@@ -163,7 +169,7 @@ if(OPT_ENABLE_CLANG_TIDY)
     #--checks=
     clang-analyzer-*,google-*,-google-build-using-namespace#,cppcoreguidelines-*,-cppcoreguidelines-avoid-magic-numbers
     #--header-filter=
-    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_CPP_SOURCE_DIR}
   )
 endif()
 
@@ -181,7 +187,7 @@ elseif(USE_MSVC)
   helpers_checkCompilerVersion(${CMAKE_CXX_COMPILER_ID} 14.0) # 15.7 is ideal
 endif()
 
-# Specify custom compiler and linker flags.
+# Specify generic compiler and linker flags.
 if(USE_GCC OR USE_CLANG)
   # This is a mix of warning options not available in all GCC / Clang version.
   list(APPEND CXX_FLAGS 
@@ -211,7 +217,7 @@ if(USE_GCC OR USE_CLANG)
   )
 
   # To avoid warnings about the previous mismatched GCC / Clang options.
-  if (USE_CLANG)
+  if(USE_CLANG)
     list(APPEND CXX_FLAGS -Wno-unknown-warning-option)
   endif()
 
@@ -228,7 +234,7 @@ if(USE_GCC OR USE_CLANG)
     # -funroll-loops
   )
 
-  if (NOT OPT_ENABLE_RTTI)
+  if(NOT OPT_ENABLE_RTTI)
     list(APPEND CXX_FLAGS -fno-rtti)
   endif()
 
@@ -256,9 +262,16 @@ if(USE_GCC OR USE_CLANG)
   # [improve] Used only for static library compilation.
   if(NOT OPT_BUILD_SHARED_LIBS)
     list(APPEND CXX_FLAGS         -fvisibility=hidden)
-    if (NOT EMSCRIPTEN)
+    if(NOT EMSCRIPTEN)
       list(APPEND CustomLinkFlags   -Wl,--no-undefined)
     endif()
+  endif()
+
+  # Definitions.
+  if(NOT DEBUG)
+    list(APPEND CustomDefinitions 
+      -DNDEBUG=1
+    )
   endif()
 
 elseif(USE_MSVC)
@@ -275,7 +288,7 @@ elseif(USE_MSVC)
     /permissive-
   )
 
-  if (NOT OPT_ENABLE_RTTI)
+  if(NOT OPT_ENABLE_RTTI)
     list(APPEND CXX_FLAGS /GR-)
   endif()
 
@@ -306,7 +319,7 @@ endif()
 # See 
 #   * https://emscripten.org/docs/compiling/WebAssembly.html
 #   * https://emscripten.org/docs/tools_reference/emcc.html
-if (EMSCRIPTEN)
+if(EMSCRIPTEN)
   # Compiler release flags.
   list(APPEND CXX_FLAGS_RELEASE
     -msimd128                             # Needed to enable SIMD optimization.
@@ -339,32 +352,25 @@ if (EMSCRIPTEN)
   )
 
   # Linker debug flags.
-  if (DEBUG)
+  if(DEBUG)
     list(APPEND CustomLinkFlags
       -v                                  # Verbose output.
     )
   endif()
 
-  # ---------------------------------
   # [ here for documentation ]
   # This method will fail to recompile after code modification, so instead
-  # we generate only the wasm/js file that we load manually in index.js.
-  if (FALSE)
-    # Directory of the webapp sources.
-    set(PROJECT_WEB_SOURCE_DIR "${PROJECT_SOURCE_DIR}/webapp")
-    
-    # Output to HTML.
-    set(CMAKE_EXECUTABLE_SUFFIX ".html")
-
-    # Use a template HTML file with optional pre and post js to optimize.
-    list(APPEND CustomLinkFlags
-      --shell-file "${PROJECT_WEB_SOURCE_DIR}/index.html"
-    #   --pre-js "${PROJECT_WEB_SOURCE_DIR}/pre-main.js"
-    #   --post-js "${PROJECT_WEB_SOURCE_DIR}/post-main.js"
-    )
-  endif()
-  # ---------------------------------
-
+  # we generate only a wasm / js file that we load manually in index.js.
+  # if(FALSE)
+  #   # Output to HTML.
+  #   set(CMAKE_EXECUTABLE_SUFFIX ".html")
+  #   # Use a template HTML file with optional pre and post js to optimize.
+  #   list(APPEND CustomLinkFlags
+  #     --shell-file "${PROJECT_WEB_STATIC_DIR}/index.html"
+  #   #   --pre-js "${PROJECT_WEB_STATIC_DIR}/pre-main.js"
+  #   #   --post-js "${PROJECT_WEB_STATIC_DIR}/post-main.js"
+  #   )
+  # endif()
 endif()
 
 # -----------------------------------------------------------------------------
@@ -372,55 +378,55 @@ endif()
 # -----------------------------------------------------------------------------
 
 # Defines LIBM_LIBRARIES for mathematics when needed.
-helpers_findLibM()
+# helpers_findLibM()
+# list(APPEND CustomLibs ${LIBM_LIBRARIES})
+
+# OpenMP.
+if(OPT_USE_OPENMP)
+  find_package(OpenMP)
+  if(OPENMP_FOUND)
+    list(APPEND CXX_FLAGS   "${OpenMP_CXX_FLAGS}")
+    list(APPEND CustomLibs  "${OpenMP_CXX_LIBRARIES}")
+  endif()
+endif()
 
 if(NOT EMSCRIPTEN)
-  # OpenMP.
-  if (OPT_USE_OPENMP)
-    find_package(OpenMP)
-    if(OPENMP_FOUND)
-      list(APPEND CXX_FLAGS       "${OpenMP_CXX_FLAGS}")
-      list(APPEND CustomLibs      "${OpenMP_CXX_LIBRARIES}")
-    endif()
-  endif()
-
   # OpenGL.
   find_package(OpenGL REQUIRED)
+  list(APPEND CustomIncludeDirs  ${OPENGL_INCLUDE_DIRS})
+  list(APPEND CustomLibs         ${OPENGL_LIBRARIES})
 
-  # GLFW : window manager.
+  # GLFW.
   set(GLFW_ROOT ${PROJECT_THIRD_PARTY_DIR}/glfw)
   set(GLFW_LIBRARY glfw)
   set(GLFW_INCLUDE_DIR ${GLFW_ROOT}/include)
+  list(APPEND CustomIncludeDirs ${GLFW_INCLUDE_DIR})
+  list(APPEND CustomLibs        ${GLFW_LIBRARY})
+
   if(NOT EXISTS ${GLFW_INCLUDE_DIR})
     message(FATAL_ERROR "GLFW was not found, you can retrieve it via the command : \n"
                         "git submodule update --init"
     )
+  else()
+    # Compile the library as submodule.
+    set(GLFW_BUILD_SHARED_LIBS OPT_BUILD_SHARED_LIBS CACHE BOOL "Build GLFW as shared library.")
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Do not build GLFW examples.")
+    set(GLFW_BUILD_TESTS    OFF CACHE BOOL "Do not run GLFW tests.")
+    set(GLFW_BUILD_DOCS     OFF CACHE BOOL "Do not build GLFW documentation.")
+    set(GLFW_INSTALL        OFF CACHE BOOL "Do not generate install targets.")
+    add_subdirectory(${GLFW_ROOT} glfw EXCLUDE_FROM_ALL)
   endif()
-  set(GLFW_BUILD_SHARED_LIBS   OPT_BUILD_SHARED_LIBS CACHE BOOL "Build GLFW as shared library.")
-  set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Do not build GLFW examples.")
-  set(GLFW_BUILD_TESTS    OFF CACHE BOOL "Do not run GLFW tests.")
-  set(GLFW_BUILD_DOCS     OFF CACHE BOOL "Do not build GLFW documentation.")
-  set(GLFW_INSTALL        OFF CACHE BOOL "Do not generate install targets.")
-  add_subdirectory(${GLFW_ROOT} glfw EXCLUDE_FROM_ALL)
+
 endif()
 
 # -----------------------------------------------------------------------------
-# Project dependencies settings.
+# Generic dependencies settings.
 # -----------------------------------------------------------------------------
 
 # Include directories.
 list(APPEND CustomIncludeDirs
-  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_CPP_SOURCE_DIR}
   ${PROJECT_THIRD_PARTY_DIR}
-  
-  ${OPENGL_INCLUDE_DIRS}
-  ${GLFW_INCLUDE_DIR}
-)
-
-# Libraries.
-list(APPEND CustomLibs
-  ${OPENGL_LIBRARIES}
-  ${GLFW_LIBRARY}
 )
 
 # Definitions.
@@ -428,23 +434,25 @@ list(APPEND CustomDefinitions
   -DPROJECT_NPROC_MAX=${PROJECT_NPROC_MAX}
 )
 
+# Transform the linker flags from a list to a string to be accepted by set_target_properties LINK_FLAG.
+# On CMake 3.13+, we could use LINK_OPTIONS instead.
+set(LinkFlagsString "")
+foreach(flag ${CustomLinkFlags})
+  set(LinkFlagsString "${LinkFlagsString} ${flag}")
+endforeach()
+
 # -----------------------------------------------------------------------------
 # System dependencies.
 # -----------------------------------------------------------------------------
 
 if(OS_LINUX)
-  include(FindPkgConfig)
-  if(NOT DEBUG)
-    list(APPEND CustomDefinitions 
-      -DNDEBUG=1
-    )
-  endif()
+  # include(FindPkgConfig)
 endif()
 
 # -----------------------------------------------------------------------------
 # Sources.
 # -----------------------------------------------------------------------------
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/cpp/) #
+add_subdirectory(${PROJECT_CPP_SOURCE_DIR})
 
 # -----------------------------------------------------------------------------
