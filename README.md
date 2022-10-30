@@ -34,7 +34,7 @@ emcmake cmake . -B BUILD -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build BUILD
 
 # Serve the WebApp.
-python3 ./tools/simple_server/main.py --serve ../bin/public
+python3 ./tools/simple_server/main.py --serve ./bin/public
 ```
 
 </details>
